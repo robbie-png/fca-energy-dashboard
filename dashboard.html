@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FCA Energy Savings Opportunities</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Manrope', sans-serif;
+            background-color: #F5F7FA;
+            color: #2D3748;
+            min-height: 100vh;
+            padding: 32px 48px;
+        }
+
+        /* Header */
+        .header {
+            margin-bottom: 32px;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1A365D;
+        }
+
+        /* KPI Row */
+        .kpi-row {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+
+        .kpi-tile {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            border: 1px solid #E2E8F0;
+        }
+
+        .kpi-label {
+            font-size: 13px;
+            font-weight: 500;
+            color: #64748B;
+            margin-bottom: 12px;
+            line-height: 1.4;
+        }
+
+        .kpi-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #1A365D;
+        }
+
+        .kpi-unit {
+            font-size: 14px;
+            font-weight: 500;
+            color: #64748B;
+            margin-left: 4px;
+        }
+
+        .kpi-secondary {
+            font-size: 13px;
+            color: #64748B;
+            margin-top: 8px;
+        }
+
+        .kpi-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+
+        .kpi-indicator.positive {
+            color: #059669;
+        }
+
+        .kpi-indicator.negative {
+            color: #DC2626;
+        }
+
+        /* Filters */
+        .filters {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .filter-dropdown {
+            position: relative;
+        }
+
+        .filter-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            background: white;
+            border: 1px solid #CBD5E1;
+            border-radius: 8px;
+            font-family: 'Manrope', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            color: #475569;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .filter-btn:hover {
+            border-color: #94A3B8;
+            background: #F8FAFC;
+        }
+
+        .filter-btn svg {
+            width: 16px;
+            height: 16px;
+            color: #64748B;
+            transition: transform 0.2s ease;
+        }
+
+        .filter-btn.open svg {
+            transform: rotate(180deg);
+        }
+
+        .filter-badge {
+            background: #E0F2FE;
+            color: #0369A1;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 12px;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: calc(100% + 4px);
+            left: 0;
+            min-width: 200px;
+            background: white;
+            border: 1px solid #E2E8F0;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+            display: none;
+        }
+
+        .dropdown-menu.open {
+            display: block;
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            font-size: 14px;
+            color: #475569;
+            cursor: pointer;
+            transition: background 0.1s ease;
+        }
+
+        .dropdown-item:hover {
+            background: #F8FAFC;
+        }
+
+        .dropdown-item:first-child {
+            border-radius: 8px 8px 0 0;
+        }
+
+        .dropdown-item:last-child {
+            border-radius: 0 0 8px 8px;
+        }
+
+        .dropdown-item input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: #0369A1;
+        }
+
+        .dropdown-item.selected {
+            background: #F0F9FF;
+        }
+
+        /* Facility Colors */
+        .facility-tag {
+            display: inline-block;
+            padding: 4px 10px;
+            font-size: 12px;
+            font-weight: 500;
+            border-radius: 6px;
+        }
+
+        .facility-castle-rock {
+            background: #DBEAFE;
+            color: #1E40AF;
+        }
+
+        .facility-porter {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+
+        .facility-littleton {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+
+        /* Tables Section */
+        .tables-section {
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            border: 1px solid #E2E8F0;
+            overflow: hidden;
+        }
+
+        .table-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid #E2E8F0;
+        }
+
+        .table-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1A365D;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: #F8FAFC;
+        }
+
+        th {
+            padding: 14px 20px;
+            text-align: left;
+            font-size: 12px;
+            font-weight: 600;
+            color: #64748B;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid #E2E8F0;
+        }
+
+        td {
+            padding: 16px 20px;
+            font-size: 14px;
+            color: #475569;
+            border-bottom: 1px solid #F1F5F9;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .project-group-row {
+            cursor: pointer;
+            transition: background 0.1s ease;
+        }
+
+        .project-group-row:hover {
+            background: #F8FAFC;
+        }
+
+        .project-group-row.hidden {
+            display: none;
+        }
+
+        .project-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            color: #1A365D;
+        }
+
+        .expand-icon {
+            width: 18px;
+            height: 18px;
+            color: #94A3B8;
+            transition: transform 0.2s ease;
+        }
+
+        .project-group-row.expanded .expand-icon {
+            transform: rotate(90deg);
+        }
+
+        .sub-project {
+            background: #FAFBFC;
+        }
+
+        .sub-project td {
+            color: #64748B;
+            font-size: 13px;
+        }
+
+        .sub-project td:first-child {
+            padding-left: 46px;
+        }
+
+        .sub-project.hidden {
+            display: none;
+        }
+
+        .numeric {
+            font-variant-numeric: tabular-nums;
+            text-align: right;
+        }
+
+        th.numeric {
+            text-align: right;
+        }
+
+        .empty-state {
+            padding: 48px 24px;
+            text-align: center;
+            color: #94A3B8;
+        }
+
+        .empty-state-text {
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <h1>FCA Energy Savings Opportunities</h1>
+    </header>
+
+    <!-- KPI Metrics Row -->
+    <section class="kpi-row">
+        <div class="kpi-tile">
+            <div class="kpi-label">5-Year EBITDA/SF Projected Improvement</div>
+            <div class="kpi-value"><span id="kpi-ebitda">$9.00</span><span class="kpi-unit">/sq ft</span></div>
+        </div>
+        <div class="kpi-tile">
+            <div class="kpi-label">Regulatory Fees Avoided</div>
+            <div class="kpi-value"><span id="kpi-regulatory">$2.8</span><span class="kpi-unit">M</span></div>
+        </div>
+        <div class="kpi-tile">
+            <div class="kpi-label">Average Annual CAPEX</div>
+            <div class="kpi-value"><span id="kpi-capex">$1.25</span><span class="kpi-unit">M</span></div>
+        </div>
+        <div class="kpi-tile">
+            <div class="kpi-label">Aggregated Payback</div>
+            <div class="kpi-value"><span id="kpi-payback">6.2</span><span class="kpi-unit">years</span></div>
+        </div>
+        <div class="kpi-tile">
+            <div class="kpi-label">Projected EUI vs Target EUI</div>
+            <div class="kpi-value"><span id="kpi-eui">72.4</span><span class="kpi-unit">kWh/sq ft/yr</span></div>
+            <div class="kpi-secondary"><span id="kpi-goal-label">Goal EUI</span>: <span id="kpi-goal-value">58.0</span> kWh/sq ft/yr</div>
+            <div class="kpi-indicator negative" id="kpi-eui-indicator">
+                <svg id="kpi-eui-arrow" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 19V5M5 12l7-7 7 7"/>
+                </svg>
+                <span id="kpi-eui-diff">24.8% above target</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Filter Controls -->
+    <section class="filters">
+        <div class="filter-dropdown" id="facilityDropdown">
+            <button class="filter-btn" onclick="toggleDropdown('facilityDropdown')">
+                <span class="filter-badge" id="facilityCount">3</span>
+                Facilities
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M6 9l6 6 6-6"/>
+                </svg>
+            </button>
+            <div class="dropdown-menu" id="facilityMenu">
+                <label class="dropdown-item selected">
+                    <input type="checkbox" checked data-facility="Castle Rock" onchange="applyFilters()"> Castle Rock
+                </label>
+                <label class="dropdown-item selected">
+                    <input type="checkbox" checked data-facility="Porter" onchange="applyFilters()"> Porter
+                </label>
+                <label class="dropdown-item selected">
+                    <input type="checkbox" checked data-facility="Littleton" onchange="applyFilters()"> Littleton
+                </label>
+            </div>
+        </div>
+        <div class="filter-dropdown" id="regionDropdown">
+            <button class="filter-btn" onclick="toggleDropdown('regionDropdown')">
+                <span class="filter-badge" id="regionCount">1</span>
+                Region
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M6 9l6 6 6-6"/>
+                </svg>
+            </button>
+            <div class="dropdown-menu" id="regionMenu">
+                <label class="dropdown-item selected">
+                    <input type="checkbox" checked data-region="Rocky Mountain" onchange="applyFilters()"> Rocky Mountain
+                </label>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tables Section -->
+    <section class="tables-section">
+        <!-- Energy Projects Table -->
+        <div class="table-container">
+            <div class="table-header">
+                <h2 class="table-title">Prioritized Energy Projects</h2>
+            </div>
+            <table id="energyProjectsTable">
+                <thead>
+                    <tr>
+                        <th>Project Group</th>
+                        <th>Facility</th>
+                        <th class="numeric">5-Yr EBITDA/SF Projected Improvement</th>
+                        <th class="numeric">Regulatory Fees Avoided</th>
+                        <th class="numeric">Payback Period</th>
+                        <th class="numeric">CAPEX Required</th>
+                        <th class="numeric">Est. Completion</th>
+                    </tr>
+                </thead>
+                <tbody id="energyProjectsBody">
+                    <!-- Rows will be generated by JavaScript -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Non-Energy Projects Table -->
+        <div class="table-container">
+            <div class="table-header">
+                <h2 class="table-title">Prioritized Non-Energy Projects</h2>
+            </div>
+            <table id="nonEnergyProjectsTable">
+                <thead>
+                    <tr>
+                        <th>Project Group</th>
+                        <th>Facility</th>
+                        <th class="numeric">5-Yr EBITDA/SF Projected Improvement</th>
+                        <th class="numeric">Regulatory Fees Avoided</th>
+                        <th class="numeric">Payback Period</th>
+                        <th class="numeric">CAPEX Required</th>
+                        <th class="numeric">Est. Completion</th>
+                    </tr>
+                </thead>
+                <tbody id="nonEnergyProjectsBody">
+                    <!-- Rows will be generated by JavaScript -->
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <script>
+        // Project data
+        const energyProjects = [
+            {
+                name: "Building Envelope Upgrades",
+                facility: "Porter",
+                ebitda: 3.20,
+                regulatory: 1.2,
+                payback: 8.2,
+                capex: 4200000,
+                year: 2026,
+                subProjects: [
+                    { name: "North Wing Roof", ebitda: 1.85, regulatory: 0.7, payback: 7.8, capex: 2400000, year: 2026 },
+                    { name: "Skylights B", ebitda: 1.35, regulatory: 0.5, payback: 8.8, capex: 1800000, year: 2026 }
+                ]
+            },
+            {
+                name: "Replace HVAC Mechanical Room",
+                facility: "Castle Rock",
+                ebitda: 2.50,
+                regulatory: 0.8,
+                payback: 6.5,
+                capex: 240000,
+                year: 2025,
+                subProjects: [
+                    { name: "Unit 1", ebitda: 1.40, regulatory: 0.45, payback: 6.2, capex: 135000, year: 2025 },
+                    { name: "Unit 3", ebitda: 1.10, regulatory: 0.35, payback: 6.9, capex: 105000, year: 2025 }
+                ]
+            },
+            {
+                name: "Retro-Commission HVAC System",
+                facility: "Littleton",
+                ebitda: 1.80,
+                regulatory: 0.3,
+                payback: 4.1,
+                capex: 160000,
+                year: 2025,
+                subProjects: []
+            },
+            {
+                name: "Replace VFDs as Needed",
+                facility: "Castle Rock",
+                ebitda: 1.50,
+                regulatory: 0.5,
+                payback: 5.8,
+                capex: 400000,
+                year: 2026,
+                subProjects: [
+                    { name: "Pump 1", ebitda: 0.55, regulatory: 0.18, payback: 5.5, capex: 140000, year: 2026 },
+                    { name: "Pump 2", ebitda: 0.50, regulatory: 0.17, payback: 5.9, capex: 130000, year: 2026 },
+                    { name: "AHU Controls", ebitda: 0.45, regulatory: 0.15, payback: 6.1, capex: 130000, year: 2026 }
+                ]
+            }
+        ];
+
+        const nonEnergyProjects = [
+            {
+                name: "Fire Suppression System Update",
+                facility: "Porter",
+                ebitda: null,
+                regulatory: null,
+                payback: null,
+                capex: 850000,
+                year: 2025,
+                subProjects: []
+            },
+            {
+                name: "Emergency Generator Replacement",
+                facility: "Castle Rock",
+                ebitda: null,
+                regulatory: null,
+                payback: null,
+                capex: 1100000,
+                year: 2026,
+                subProjects: []
+            }
+        ];
+
+        // Facility class mapping
+        const facilityClasses = {
+            "Castle Rock": "facility-castle-rock",
+            "Porter": "facility-porter",
+            "Littleton": "facility-littleton"
+        };
+
+        // Facility EUI data (ASHRAE hospital benchmark for Colorado - 58 kWh/sq ft/yr)
+        const facilityData = {
+            "Castle Rock": { goalEUI: 58.0, projectedEUI: 68.5 },
+            "Porter": { goalEUI: 58.0, projectedEUI: 74.2 },
+            "Littleton": { goalEUI: 58.0, projectedEUI: 71.8 }
+        };
+
+        // Get selected facilities
+        function getSelectedFacilities() {
+            const checkboxes = document.querySelectorAll('#facilityMenu input[type="checkbox"]');
+            return Array.from(checkboxes)
+                .filter(cb => cb.checked)
+                .map(cb => cb.dataset.facility);
+        }
+
+        // Get selected regions
+        function getSelectedRegions() {
+            const checkboxes = document.querySelectorAll('#regionMenu input[type="checkbox"]');
+            return Array.from(checkboxes)
+                .filter(cb => cb.checked)
+                .map(cb => cb.dataset.region);
+        }
+
+        // Format currency
+        function formatCurrency(value, inMillions = false) {
+            if (value === null) return "N/A";
+            if (inMillions) {
+                return "$" + (value / 1000000).toFixed(1) + "M";
+            }
+            if (value >= 1000000) {
+                return "$" + (value / 1000000).toFixed(1) + "M";
+            }
+            return "$" + (value / 1000).toFixed(0) + "K";
+        }
+
+        // Format EBITDA
+        function formatEbitda(value) {
+            if (value === null) return "N/A";
+            return "$" + value.toFixed(2);
+        }
+
+        // Format payback
+        function formatPayback(value) {
+            if (value === null) return "N/A";
+            return value.toFixed(1) + " yrs";
+        }
+
+        // Format regulatory
+        function formatRegulatory(value) {
+            if (value === null) return "N/A";
+            return "$" + value.toFixed(1) + "M";
+        }
+
+        // Render project row
+        function renderProjectRow(project, isExpanded = true) {
+            const facilityClass = facilityClasses[project.facility];
+            const hasSubProjects = project.subProjects && project.subProjects.length > 0;
+
+            let html = `
+                <tr class="project-group-row ${isExpanded ? 'expanded' : ''}" data-facility="${project.facility}" onclick="toggleProject(this)">
+                    <td>
+                        <div class="project-group">
+                            <svg class="expand-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="${hasSubProjects ? '' : 'visibility: hidden;'}">
+                                <path d="M9 18l6-6-6-6"/>
+                            </svg>
+                            ${project.name}
+                        </div>
+                    </td>
+                    <td><span class="facility-tag ${facilityClass}">${project.facility}</span></td>
+                    <td class="numeric">${formatEbitda(project.ebitda)}</td>
+                    <td class="numeric">${formatRegulatory(project.regulatory)}</td>
+                    <td class="numeric">${formatPayback(project.payback)}</td>
+                    <td class="numeric">${formatCurrency(project.capex)}</td>
+                    <td class="numeric">${project.year}</td>
+                </tr>
+            `;
+
+            if (project.subProjects) {
+                project.subProjects.forEach(sub => {
+                    html += `
+                        <tr class="sub-project ${isExpanded ? '' : 'hidden'}" data-facility="${project.facility}">
+                            <td>${sub.name}</td>
+                            <td></td>
+                            <td class="numeric">${formatEbitda(sub.ebitda)}</td>
+                            <td class="numeric">${formatRegulatory(sub.regulatory)}</td>
+                            <td class="numeric">${formatPayback(sub.payback)}</td>
+                            <td class="numeric">${formatCurrency(sub.capex)}</td>
+                            <td class="numeric">${sub.year}</td>
+                        </tr>
+                    `;
+                });
+            }
+
+            return html;
+        }
+
+        // Render tables
+        function renderTables() {
+            const selectedFacilities = getSelectedFacilities();
+            const selectedRegions = getSelectedRegions();
+
+            // Filter projects
+            const filteredEnergy = energyProjects.filter(p =>
+                selectedFacilities.includes(p.facility) && selectedRegions.length > 0
+            );
+            const filteredNonEnergy = nonEnergyProjects.filter(p =>
+                selectedFacilities.includes(p.facility) && selectedRegions.length > 0
+            );
+
+            // Sort by EBITDA descending
+            filteredEnergy.sort((a, b) => (b.ebitda || 0) - (a.ebitda || 0));
+
+            // Render energy projects
+            const energyBody = document.getElementById('energyProjectsBody');
+            energyBody.innerHTML = filteredEnergy.map(p => renderProjectRow(p, true)).join('');
+
+            // Render non-energy projects
+            const nonEnergyBody = document.getElementById('nonEnergyProjectsBody');
+            nonEnergyBody.innerHTML = filteredNonEnergy.map(p => renderProjectRow(p, true)).join('');
+        }
+
+        // Update KPIs based on filtered data
+        function updateKPIs() {
+            const selectedFacilities = getSelectedFacilities();
+            const selectedRegions = getSelectedRegions();
+
+            // Filter energy projects only (non-energy don't contribute to energy KPIs)
+            const filteredEnergy = energyProjects.filter(p =>
+                selectedFacilities.includes(p.facility) && selectedRegions.length > 0
+            );
+
+            if (filteredEnergy.length === 0) {
+                document.getElementById('kpi-ebitda').textContent = '$0.00';
+                document.getElementById('kpi-regulatory').textContent = '$0.0';
+                document.getElementById('kpi-capex').textContent = '$0.0';
+                document.getElementById('kpi-payback').textContent = '0.0';
+                return;
+            }
+
+            // Sum of EBITDA
+            const totalEbitda = filteredEnergy.reduce((sum, p) => sum + (p.ebitda || 0), 0);
+            document.getElementById('kpi-ebitda').textContent = '$' + totalEbitda.toFixed(2);
+
+            // Sum of regulatory fees avoided
+            const totalRegulatory = filteredEnergy.reduce((sum, p) => sum + (p.regulatory || 0), 0);
+            document.getElementById('kpi-regulatory').textContent = '$' + totalRegulatory.toFixed(1);
+
+            // Average CAPEX (convert to millions)
+            const avgCapex = filteredEnergy.reduce((sum, p) => sum + p.capex, 0) / filteredEnergy.length;
+            document.getElementById('kpi-capex').textContent = '$' + (avgCapex / 1000000).toFixed(2);
+
+            // Average payback
+            const projectsWithPayback = filteredEnergy.filter(p => p.payback !== null);
+            const avgPayback = projectsWithPayback.length > 0
+                ? projectsWithPayback.reduce((sum, p) => sum + p.payback, 0) / projectsWithPayback.length
+                : 0;
+            document.getElementById('kpi-payback').textContent = avgPayback.toFixed(1);
+
+            // Calculate EUI metrics based on selected facilities
+            updateEUIMetrics();
+        }
+
+        // Update EUI metrics based on selected facilities
+        function updateEUIMetrics() {
+            const selectedFacilities = getSelectedFacilities();
+            const selectedRegions = getSelectedRegions();
+
+            if (selectedFacilities.length === 0 || selectedRegions.length === 0) {
+                document.getElementById('kpi-eui').textContent = '0.0';
+                document.getElementById('kpi-goal-value').textContent = '0.0';
+                document.getElementById('kpi-goal-label').textContent = 'Goal EUI';
+                document.getElementById('kpi-eui-diff').textContent = 'N/A';
+                return;
+            }
+
+            // Calculate average projected EUI
+            const avgProjectedEUI = selectedFacilities.reduce((sum, f) => sum + facilityData[f].projectedEUI, 0) / selectedFacilities.length;
+            document.getElementById('kpi-eui').textContent = avgProjectedEUI.toFixed(1);
+
+            // Calculate average goal EUI
+            const avgGoalEUI = selectedFacilities.reduce((sum, f) => sum + facilityData[f].goalEUI, 0) / selectedFacilities.length;
+            document.getElementById('kpi-goal-value').textContent = avgGoalEUI.toFixed(1);
+
+            // Update goal label based on number of facilities selected
+            const goalLabel = document.getElementById('kpi-goal-label');
+            if (selectedFacilities.length === 1) {
+                goalLabel.textContent = 'Goal EUI (Colorado)';
+            } else {
+                goalLabel.textContent = 'Avg Goal EUI';
+            }
+
+            // Calculate and display percentage difference
+            const percentDiff = ((avgProjectedEUI - avgGoalEUI) / avgGoalEUI) * 100;
+            const indicator = document.getElementById('kpi-eui-indicator');
+            const diffText = document.getElementById('kpi-eui-diff');
+            const arrow = document.getElementById('kpi-eui-arrow');
+
+            if (avgProjectedEUI > avgGoalEUI) {
+                indicator.className = 'kpi-indicator negative';
+                arrow.innerHTML = '<path d="M12 19V5M5 12l7-7 7 7"/>';
+                diffText.textContent = Math.abs(percentDiff).toFixed(1) + '% above target';
+            } else {
+                indicator.className = 'kpi-indicator positive';
+                arrow.innerHTML = '<path d="M12 5v14M5 12l7 7 7-7"/>';
+                diffText.textContent = Math.abs(percentDiff).toFixed(1) + '% below target';
+            }
+        }
+
+        // Update filter counts
+        function updateFilterCounts() {
+            const facilityCheckboxes = document.querySelectorAll('#facilityMenu input[type="checkbox"]');
+            const facilityCount = Array.from(facilityCheckboxes).filter(cb => cb.checked).length;
+            document.getElementById('facilityCount').textContent = facilityCount;
+
+            facilityCheckboxes.forEach(cb => {
+                cb.closest('.dropdown-item').classList.toggle('selected', cb.checked);
+            });
+
+            const regionCheckboxes = document.querySelectorAll('#regionMenu input[type="checkbox"]');
+            const regionCount = Array.from(regionCheckboxes).filter(cb => cb.checked).length;
+            document.getElementById('regionCount').textContent = regionCount;
+
+            regionCheckboxes.forEach(cb => {
+                cb.closest('.dropdown-item').classList.toggle('selected', cb.checked);
+            });
+        }
+
+        // Apply all filters
+        function applyFilters() {
+            updateFilterCounts();
+            renderTables();
+            updateKPIs();
+        }
+
+        // Toggle dropdown menus
+        function toggleDropdown(dropdownId) {
+            const dropdown = document.getElementById(dropdownId);
+            const btn = dropdown.querySelector('.filter-btn');
+            const menu = dropdown.querySelector('.dropdown-menu');
+
+            // Close other dropdowns
+            document.querySelectorAll('.filter-dropdown').forEach(d => {
+                if (d.id !== dropdownId) {
+                    d.querySelector('.filter-btn').classList.remove('open');
+                    d.querySelector('.dropdown-menu').classList.remove('open');
+                }
+            });
+
+            btn.classList.toggle('open');
+            menu.classList.toggle('open');
+        }
+
+        // Toggle project group expand/collapse
+        function toggleProject(row) {
+            row.classList.toggle('expanded');
+
+            // Find all sub-project rows until next project-group-row
+            let sibling = row.nextElementSibling;
+            while (sibling && sibling.classList.contains('sub-project')) {
+                sibling.classList.toggle('hidden', !row.classList.contains('expanded'));
+                sibling = sibling.nextElementSibling;
+            }
+        }
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.filter-dropdown')) {
+                document.querySelectorAll('.filter-dropdown').forEach(d => {
+                    d.querySelector('.filter-btn').classList.remove('open');
+                    d.querySelector('.dropdown-menu').classList.remove('open');
+                });
+            }
+        });
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            applyFilters();
+        });
+    </script>
+</body>
+</html>
