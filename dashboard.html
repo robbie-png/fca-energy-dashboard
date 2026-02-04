@@ -354,20 +354,26 @@
     <!-- KPI Metrics Row -->
     <section class="kpi-row">
         <div class="kpi-tile">
-            <div class="kpi-label">5-Year EBITDA/SF Projected Improvement</div>
+            <div class="kpi-label">Projected EBITDA/SF Improvement</div>
             <div class="kpi-value"><span id="kpi-ebitda">$9.00</span><span class="kpi-unit">/sq ft</span></div>
+            <div class="kpi-secondary"><span id="kpi-ebitda-current-label">Current EBITDA/SF</span>: <span id="kpi-ebitda-current">$12.50</span>/sq ft</div>
+            <div class="kpi-indicator positive" id="kpi-ebitda-indicator">
+                <svg id="kpi-ebitda-arrow" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 5v14M5 12l7 7 7-7"/>
+                </svg>
+                <span id="kpi-ebitda-diff">72.0% improvement</span>
+            </div>
         </div>
         <div class="kpi-tile">
-            <div class="kpi-label">Regulatory Fees Avoided</div>
+            <div class="kpi-label">Projected Regulatory Fees Avoided</div>
             <div class="kpi-value"><span id="kpi-regulatory">$2.8</span><span class="kpi-unit">M</span></div>
-        </div>
-        <div class="kpi-tile">
-            <div class="kpi-label">Average Annual CAPEX</div>
-            <div class="kpi-value"><span id="kpi-capex">$1.25</span><span class="kpi-unit">M</span></div>
-        </div>
-        <div class="kpi-tile">
-            <div class="kpi-label">Aggregated Payback</div>
-            <div class="kpi-value"><span id="kpi-payback">6.2</span><span class="kpi-unit">years</span></div>
+            <div class="kpi-secondary"><span id="kpi-regulatory-current-label">Current Annual Spend</span>: <span id="kpi-regulatory-current">$3.6</span>M</div>
+            <div class="kpi-indicator positive" id="kpi-regulatory-indicator">
+                <svg id="kpi-regulatory-arrow" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 5v14M5 12l7 7 7-7"/>
+                </svg>
+                <span id="kpi-regulatory-diff">77.8% reduction</span>
+            </div>
         </div>
         <div class="kpi-tile">
             <div class="kpi-label">Projected EUI vs Target EUI</div>
@@ -379,6 +385,14 @@
                 </svg>
                 <span id="kpi-eui-diff">24.8% above target</span>
             </div>
+        </div>
+        <div class="kpi-tile">
+            <div class="kpi-label">Average Annual CAPEX</div>
+            <div class="kpi-value"><span id="kpi-capex">$1.25</span><span class="kpi-unit">M</span></div>
+        </div>
+        <div class="kpi-tile">
+            <div class="kpi-label">Aggregated Payback</div>
+            <div class="kpi-value"><span id="kpi-payback">6.2</span><span class="kpi-unit">years</span></div>
         </div>
     </section>
 
@@ -554,11 +568,26 @@
             "Littleton": "facility-littleton"
         };
 
-        // Facility EUI data (ASHRAE hospital benchmark for Colorado - 58 kWh/sq ft/yr)
+        // Facility data (ASHRAE hospital benchmark for Colorado - 58 kWh/sq ft/yr)
         const facilityData = {
-            "Castle Rock": { goalEUI: 58.0, projectedEUI: 68.5 },
-            "Porter": { goalEUI: 58.0, projectedEUI: 74.2 },
-            "Littleton": { goalEUI: 58.0, projectedEUI: 71.8 }
+            "Castle Rock": {
+                goalEUI: 58.0,
+                projectedEUI: 68.5,
+                currentEbitdaSF: 4.20,
+                currentRegulatorySpend: 1.2
+            },
+            "Porter": {
+                goalEUI: 58.0,
+                projectedEUI: 74.2,
+                currentEbitdaSF: 3.80,
+                currentRegulatorySpend: 1.4
+            },
+            "Littleton": {
+                goalEUI: 58.0,
+                projectedEUI: 71.8,
+                currentEbitdaSF: 4.50,
+                currentRegulatorySpend: 1.0
+            }
         };
 
         // Get selected facilities
@@ -685,21 +714,50 @@
                 selectedFacilities.includes(p.facility) && selectedRegions.length > 0
             );
 
-            if (filteredEnergy.length === 0) {
+            if (filteredEnergy.length === 0 || selectedFacilities.length === 0 || selectedRegions.length === 0) {
                 document.getElementById('kpi-ebitda').textContent = '$0.00';
+                document.getElementById('kpi-ebitda-current').textContent = '$0.00';
+                document.getElementById('kpi-ebitda-diff').textContent = 'N/A';
                 document.getElementById('kpi-regulatory').textContent = '$0.0';
+                document.getElementById('kpi-regulatory-current').textContent = '$0.0';
+                document.getElementById('kpi-regulatory-diff').textContent = 'N/A';
                 document.getElementById('kpi-capex').textContent = '$0.0';
                 document.getElementById('kpi-payback').textContent = '0.0';
+                updateEUIMetrics();
                 return;
             }
 
-            // Sum of EBITDA
-            const totalEbitda = filteredEnergy.reduce((sum, p) => sum + (p.ebitda || 0), 0);
-            document.getElementById('kpi-ebitda').textContent = '$' + totalEbitda.toFixed(2);
+            // Sum of projected EBITDA improvement from projects
+            const totalEbitdaImprovement = filteredEnergy.reduce((sum, p) => sum + (p.ebitda || 0), 0);
+            document.getElementById('kpi-ebitda').textContent = '$' + totalEbitdaImprovement.toFixed(2);
 
-            // Sum of regulatory fees avoided
+            // Sum of current EBITDA/SF across selected facilities
+            const totalCurrentEbitda = selectedFacilities.reduce((sum, f) => sum + facilityData[f].currentEbitdaSF, 0);
+            document.getElementById('kpi-ebitda-current').textContent = '$' + totalCurrentEbitda.toFixed(2);
+
+            // Update EBITDA label based on facility count
+            const ebitdaLabel = document.getElementById('kpi-ebitda-current-label');
+            ebitdaLabel.textContent = selectedFacilities.length === 1 ? 'Current EBITDA/SF' : 'Sum Current EBITDA/SF';
+
+            // Calculate EBITDA improvement percentage
+            const ebitdaImprovementPct = (totalEbitdaImprovement / totalCurrentEbitda) * 100;
+            document.getElementById('kpi-ebitda-diff').textContent = ebitdaImprovementPct.toFixed(1) + '% improvement';
+
+            // Sum of regulatory fees avoided from projects
             const totalRegulatory = filteredEnergy.reduce((sum, p) => sum + (p.regulatory || 0), 0);
             document.getElementById('kpi-regulatory').textContent = '$' + totalRegulatory.toFixed(1);
+
+            // Sum of current regulatory spend across selected facilities
+            const totalCurrentRegulatory = selectedFacilities.reduce((sum, f) => sum + facilityData[f].currentRegulatorySpend, 0);
+            document.getElementById('kpi-regulatory-current').textContent = '$' + totalCurrentRegulatory.toFixed(1);
+
+            // Update regulatory label based on facility count
+            const regulatoryLabel = document.getElementById('kpi-regulatory-current-label');
+            regulatoryLabel.textContent = selectedFacilities.length === 1 ? 'Current Annual Spend' : 'Sum Current Annual Spend';
+
+            // Calculate regulatory reduction percentage
+            const regulatoryReductionPct = (totalRegulatory / totalCurrentRegulatory) * 100;
+            document.getElementById('kpi-regulatory-diff').textContent = regulatoryReductionPct.toFixed(1) + '% reduction';
 
             // Average CAPEX (convert to millions)
             const avgCapex = filteredEnergy.reduce((sum, p) => sum + p.capex, 0) / filteredEnergy.length;
