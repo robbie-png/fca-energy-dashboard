@@ -735,9 +735,9 @@
             const totalCurrentEbitda = selectedFacilities.reduce((sum, f) => sum + facilityData[f].currentEbitdaSF, 0);
             document.getElementById('kpi-ebitda-current').textContent = '$' + totalCurrentEbitda.toFixed(2);
 
-            // Update EBITDA label based on facility count
+            // Update EBITDA label
             const ebitdaLabel = document.getElementById('kpi-ebitda-current-label');
-            ebitdaLabel.textContent = selectedFacilities.length === 1 ? 'Current EBITDA/SF' : 'Sum Current EBITDA/SF';
+            ebitdaLabel.textContent = 'Current EBITDA/SF';
 
             // Calculate EBITDA improvement percentage
             const ebitdaImprovementPct = (totalEbitdaImprovement / totalCurrentEbitda) * 100;
@@ -751,9 +751,9 @@
             const totalCurrentRegulatory = selectedFacilities.reduce((sum, f) => sum + facilityData[f].currentRegulatorySpend, 0);
             document.getElementById('kpi-regulatory-current').textContent = '$' + totalCurrentRegulatory.toFixed(1);
 
-            // Update regulatory label based on facility count
+            // Update regulatory label
             const regulatoryLabel = document.getElementById('kpi-regulatory-current-label');
-            regulatoryLabel.textContent = selectedFacilities.length === 1 ? 'Current Annual Spend' : 'Sum Current Annual Spend';
+            regulatoryLabel.textContent = 'Current Annual Spend';
 
             // Calculate regulatory reduction percentage
             const regulatoryReductionPct = (totalRegulatory / totalCurrentRegulatory) * 100;
